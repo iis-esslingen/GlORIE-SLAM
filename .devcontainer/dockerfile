@@ -1,0 +1,37 @@
+FROM nvidia/cuda:11.3.1-devel-ubuntu20.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV TZ=Europe/Berlin
+
+# Install basic utilities and required libraries
+RUN apt-get update && apt-get install -y \
+    git \
+    pkg-config \
+    unzip \
+    tzdata \
+    libopencv-dev \
+    cmake \
+    wget \
+    libgl1-mesa-glx && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/usr/local/cuda-11.3/bin:$PATH"
+ENV LD_LIBRARY_PATH="/usr/local/cuda-11.3/lib64:$LD_LIBRARY_PATH"
+
+ENV CONDA_DIR /opt/conda
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh && \
+    /bin/bash /tmp/miniconda.sh -b -p $CONDA_DIR && \
+    rm /tmp/miniconda.sh
+
+# Update PATH to include Conda
+ENV PATH=$CONDA_DIR/bin:$PATH
+
+# Initialize Conda
+RUN conda init bash
+
+COPY glorie_env.yaml glorie_env.yaml
+RUN conda env create -f glorie_env.yaml
+
+RUN echo ". activate glorie-slam" > ~/.bashrc
+
+CMD ["bash"]
