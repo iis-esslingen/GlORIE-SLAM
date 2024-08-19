@@ -20,6 +20,8 @@ def setup_seed(seed):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('config', type=str, help='Path to config file.')
+    parser.add_argument('--input_dir', type=str, help='Path to input directory.')
+    parser.add_argument('--output_dir', type=str, help='Path to output directory.')
     parser.add_argument("--only_tracking", action="store_true", help="Only tracking is triggered")
     args = parser.parse_args()
 
@@ -34,6 +36,10 @@ if __name__ == '__main__':
         cfg['only_tracking'] = True
         cfg['wandb'] = False
         cfg['mono_prior']['predict_online'] = True
+    if args.output_dir:
+        cfg['data']['output'] = args.output_dir
+    if args.input_dir:
+        cfg['data']['input_folder'] = args.input_dir
 
     output_dir = cfg['data']['output']
     output_dir = output_dir+f"/{cfg['setting']}/{cfg['scene']}"
