@@ -1,6 +1,6 @@
 inherit_from: ./configs/Stihl/stihl.yaml
 
-scene: freiburg1_desk
+scene: 
 only_tracking: False
 wandb: False
 

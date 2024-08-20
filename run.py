@@ -42,7 +42,7 @@ if __name__ == '__main__':
         cfg['data']['input_folder'] = args.input_dir
 
     output_dir = cfg['data']['output']
-    output_dir = output_dir+f"/{cfg['setting']}/{cfg['scene']}"
+    # output_dir = output_dir+f"/{cfg['setting']}/{cfg['scene']}"
 
     start_time = strftime("%Y-%m-%d %H:%M:%S", gmtime())
     start_info = "-"*30+Fore.LIGHTRED_EX+\
