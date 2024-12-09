@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from lietorch import SE3
 from src.utils.Printer import FontColor
@@ -39,7 +40,7 @@ def align_kf_traj(npz_path,stream,return_full_est_traj=False,printer=None):
 
     return r_a, t_a, s, traj_est, traj_ref    
 
-def align_full_traj(traj_est_full,stream,printer):
+def align_full_traj(traj_est_full,stream,printer,output_dir):
 
     timestamps = []
     traj_ref = []
@@ -57,6 +58,10 @@ def align_full_traj(traj_est_full,stream,printer):
 
     traj_est =PoseTrajectory3D(poses_se3=traj_est,timestamps=timestamps)
     traj_ref =PoseTrajectory3D(poses_se3=traj_ref,timestamps=timestamps)
+    
+    from evo.tools import file_interface
+    file_interface.write_tum_trajectory_file(file_path=os.path.join(output_dir, "trajectory_estimated.txt"), traj=traj_est, confirm_overwrite=True)
+    file_interface.write_tum_trajectory_file(file_path=os.path.join(output_dir, "trajectory_groundtruth.txt"), traj=traj_ref, confirm_overwrite=True)
 
     from evo.core import sync
 
@@ -78,19 +83,19 @@ def traj_eval_and_plot(traj_est, traj_ref, plot_parent_dir, plot_name,printer):
     ape_metric.process_data(data)
     ape_statistics = ape_metric.get_all_statistics()
 
-    printer.print("Plotting ...",FontColor.EVAL)
+    # printer.print("Plotting ...",FontColor.EVAL)
 
-    plot_collection = plot.PlotCollection("kf factor graph")
-    # metric values
-    fig_1 = plt.figure(figsize=(8, 8))
-    plot_mode = plot.PlotMode.xy
-    ax = plot.prepare_axis(fig_1, plot_mode)
-    plot.traj(ax, plot_mode, traj_ref, '--', 'gray', 'reference')
-    plot.traj_colormap(
-    ax, traj_est, ape_metric.error, plot_mode, min_map=ape_statistics["min"],
-    max_map=ape_statistics["max"], title="APE mapped onto trajectory")
-    plot_collection.add_figure("2d", fig_1)
-    plot_collection.export(f"{plot_parent_dir}/{plot_name}.png", False)
+    # plot_collection = plot.PlotCollection("kf factor graph")
+    # # metric values
+    # fig_1 = plt.figure(figsize=(8, 8))
+    # plot_mode = plot.PlotMode.xy
+    # ax = plot.prepare_axis(fig_1, plot_mode)
+    # plot.traj(ax, plot_mode, traj_ref, '--', 'gray', 'reference')
+    # plot.traj_colormap(
+    # ax, traj_est, ape_metric.error, plot_mode, min_map=ape_statistics["min"],
+    # max_map=ape_statistics["max"], title="APE mapped onto trajectory")
+    # plot_collection.add_figure("2d", fig_1)
+    # plot_collection.export(f"{plot_parent_dir}/{plot_name}.png", False)
 
     return ape_statistics
 
@@ -122,14 +127,14 @@ def kf_traj_eval(npz_path, plot_parent_dir,plot_name, stream, logger,printer):
     offline_video["scale"]=np.array(s)
     np.savez(npz_path,**offline_video)
 
-    from src.utils.Visualizer import CameraPoseVisualizer
-    est_camera_vis = CameraPoseVisualizer()
-    est_camera_vis.add_traj(traj_est.poses_se3)
-    est_camera_vis.save(f"{plot_parent_dir}/{plot_name}_3d.png",printer)
+    # from src.utils.Visualizer import CameraPoseVisualizer
+    # est_camera_vis = CameraPoseVisualizer()
+    # est_camera_vis.add_traj(traj_est.poses_se3)
+    # est_camera_vis.save(f"{plot_parent_dir}/{plot_name}_3d.png",printer)
 
-    ref_camera_vis = CameraPoseVisualizer()
-    ref_camera_vis.add_traj(traj_ref.poses_se3)
-    ref_camera_vis.save(f"{plot_parent_dir}/ref_3d.png",printer)
+    # ref_camera_vis = CameraPoseVisualizer()
+    # ref_camera_vis.add_traj(traj_ref.poses_se3)
+    # ref_camera_vis.save(f"{plot_parent_dir}/ref_3d.png",printer)
 
     return ape_statistics, s, r_a, t_a
 
@@ -145,7 +150,7 @@ def full_traj_eval(traj_filler, plot_parent_dir, plot_name, stream,logger,printe
     traj_est[kf_timestamps] = kf_poses
     traj_est_not_align = traj_est.copy()
 
-    r_a, t_a, s, traj_est, traj_ref = align_full_traj(traj_est, stream, printer)    
+    r_a, t_a, s, traj_est, traj_ref = align_full_traj(traj_est, stream, printer, plot_parent_dir)    
 
     import os
     if not os.path.exists(plot_parent_dir):
