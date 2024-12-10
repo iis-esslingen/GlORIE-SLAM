@@ -8,10 +8,9 @@ for date in "${dates[@]}"; do
     trials=("0" "1" "2" "3" "4")
 
     for trial in "${trials[@]}"; do
-    echo "  Trial: $trial"
+        echo "  Trial: $trial"
 
-        # python run.py configs/Stihl/d435i.yaml --input_dir /workspace/mounted_directory/media/fabian/data_recording_r/kwald/drosselweg/flaeche1/$date/tum/d435i --output_dir output/short/$date
-        python run.py configs/Stihl/d435i.yaml --input_dir /workspace/mounted_directory/media/fabian/data_recording_r/kwald/drosselweg/flaeche1/$date/tum/d435i --output_dir output/short_only_tracking/$date/$trial --only_tracking
+        python run.py configs/Stihl/d435i.yaml --input_dir /workspace/mounted_directory/media/$date/d435i --output_dir output/$date/$trial --only_tracking
     done
 done
 
